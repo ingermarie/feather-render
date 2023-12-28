@@ -1,11 +1,19 @@
 {
   "name": "feather-render",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "description": "A feather light render framework",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsup src/index.ts --dts --sourcemap --format cjs,esm"
   },
   "author": "ingermarien@gmail.com",
-  "license": "UNLICENSED"
+  "license": "ISC",
+  "devDependencies": {
+    "tsup": "^8.0.1"
+  }
 }
