@@ -1,7 +1,7 @@
 # Feather Render
 ![gzip](https://img.shields.io/badge/gzip-646_bytes-green)
 ![license](https://img.shields.io/badge/license-ISC-blue)
-![version](https://img.shields.io/badge/npm-v1.0.0-blue)
+![version](https://img.shields.io/badge/npm-v1.0.2-blue)
 
 ✨ A feather light render framework ✨ 646 bytes minified and gzipped - no dependencies - SSR support
 
@@ -12,7 +12,7 @@ Companion frameworks:
 - State - [feather-state](https://www.npmjs.com/package/feather-state)
 - State React - [feather-state-react](https://www.npmjs.com/package/feather-state-react)
 
-[![version](https://img.shields.io/badge/Buy_me_a_coffee_❤️-724e2c)](https://www.paypal.com/paypalme/featherframework)
+[![version](https://img.shields.io/badge/Buy_me_a_coffee%3F_❤️-724e2c)](https://www.paypal.com/paypalme/featherframework)
 
 ## Getting started
 ```
@@ -25,17 +25,13 @@ import { html } from 'feather-render';
 
 const TodoItem = ({ todo }) => {
   return html`
-    <li>
-      ${todo.title}
-    </li>
+    <li>${todo.title}</li>
   `;
 };
 
 const TodoList = () => {
   return html`
-    <ul>
-      ${todos.map(todo => TodoItem({ todo })).join('')}
-    </ul>
+    <ul>${todos.map(todo => TodoItem({ todo })).join('')}</ul>
   `;
 };
 
@@ -98,24 +94,24 @@ html`<div>...</div>` => { refs, render, mount(), unmount() }
 
 ---
 
-### `html() => mount()`
+### `html().mount()`
 ```typescript
 mount(() => void) => void;
 ```
 #### Parameters
-- `callback()` function called when component is inserted in DOM
+- `callback()` - function called when component is inserted in DOM
 
 #### Return value
 - `void`
 
 ---
 
-### `html() => unmount()`
+### `html().unmount()`
 ```typescript
 unmount(() => void) => void;
 ```
 #### Parameters
-- `callback()` function called after component is removed from DOM.
+- `callback()` - function called after component is removed from DOM.
 
 #### Return value
 - `void`
@@ -127,8 +123,8 @@ unmount(() => void) => void;
 (element: Render, target: HTMLElement) => void;
 ```
 #### Parameters
-- `element` - Render from `html()`
-- `target` - Where to mount the DOM
+- `element` - `Render` from `html()`
+- `target` - where to mount the DOM
 
 #### Return value
 - `void`
@@ -250,5 +246,6 @@ const Component = () => {
 - CLI tool
 - Minified version via CDN
 - Cleaner way of referencing values in `html`
+- Automatically unwatch values when component unmounts
 - Adding value references to `refs` somehow?
 - Support CSS in JS
