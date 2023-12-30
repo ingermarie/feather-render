@@ -55,7 +55,12 @@ export class Render {
 				child[feather] = new Feather(mount, unmount);
 			}
 		}
-		this.toString = () => html;
+		this.toString = () => {
+			if (typeof window !== 'undefined') {
+				window.__featherCurrentRender__ = undefined;
+			}
+			return html;
+		};
 	}
 }
 
