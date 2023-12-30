@@ -1,16 +1,11 @@
-export const feather = Symbol('feather');
-const internal = Symbol('internal');
+import { feather } from './bridge';
 
-declare global {
-	interface Element {
-		[feather]: Feather;
-	}
-}
+const internal = Symbol('internal');
 
 export class Feather {
 	constructor(
-		readonly mount: null | (() => void),
-		readonly unmount: null | (() => void),
+		readonly mount: () => void,
+		readonly unmount: () => void,
 	) {}
 }
 
@@ -19,29 +14,24 @@ export class Render {
 	element: null | DocumentFragment = null;
 	refs: Record<string, undefined | Element> = {};
 	mount: (mountCallback: () => void) => void = (mountCallback) => {
-		this[internal].mount = mountCallback;
+		this[internal]._mounts?.push(mountCallback);
 	};
 	unmount: (unmountCallback: () => void) => void = (unmountCallback) => {
-		this[internal].unmount = unmountCallback;
+		this[internal]._unmounts?.push(unmountCallback);
 	};
 	[internal]: {
-		mount: null | (() => void);
-		unmount: null | (() => void);
+		_mounts?: (() => void)[];
+		_unmounts?: (() => void)[];
 	} = {
-		mount: () => {
-			this[internal].mount?.()
-			this[internal].mount = null;
-		},
-		unmount: () => {
-			this[internal].unmount?.()
-			this[internal].unmount = null;
-		},
+		_mounts: [],
+		_unmounts: [],
 	};
 
 	constructor(template: TemplateStringsArray, ...args: (string | number | Render)[]) {
 		const html = template.reduce((acc, part, i) => `${acc}${part}${args[i]?.toString() || ''}`, '');
 
-		if (typeof document !== 'undefined') {
+		if (typeof window !== 'undefined') {
+			window.__featherCurrentRender__ = this;
 			const templateEl = document.createElement('template');
 			templateEl.innerHTML = html;
 
@@ -52,8 +42,17 @@ export class Render {
 				return acc;
 			}, this.refs);
 
+			const mount = () => {
+				window.__featherCurrentRender__ = undefined;
+				this[internal]._mounts?.forEach(mount => mount());
+				this[internal]._mounts = [];
+			};
+			const unmount = () => {
+				this[internal]._unmounts?.forEach(unmount => unmount());
+				this[internal]._unmounts = [];
+			};
 			for (let child of this.element.children) {
-				child[feather] = new Feather(this[internal].mount, this[internal].unmount);
+				child[feather] = new Feather(mount, unmount);
 			}
 		}
 		this.toString = () => html;

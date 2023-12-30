@@ -1,7 +1,7 @@
 # Feather Render
 ![gzip](https://img.shields.io/badge/gzip-646_bytes-green)
 ![license](https://img.shields.io/badge/license-ISC-blue)
-![version](https://img.shields.io/badge/npm-v1.0.2-blue)
+![version](https://img.shields.io/badge/npm-v1.1.0-blue)
 
 ✨ A feather light render framework ✨ 646 bytes minified and gzipped - no dependencies - SSR support
 
@@ -141,25 +141,19 @@ const { watch, ...state } = store({
 });
 
 const Component = () => {
-  const watchers = [];
-  const { refs, render, unmount } = html`
+  const { refs, render } = html`
     <p id="paragraph">${state.greeting}</p>
   `;
 
   // Watch greeting + update DOM
-  watchers.push(watch(state, 'greeting', (next) => {
+  watch(state, 'greeting', (next) => {
     refs.paragraph.textContent = next;
-  }));
+  });
 
   // Change greeting state
   setTimeout(() => {
     state.greeting = 'Hello, back!';
   }, 1000);
-
-  // Remove watchers on unmount
-  unmount(() => {
-    watchers.forEach(unwatch => unwatch());
-  });
 
   return render;
 };
@@ -181,8 +175,7 @@ const TodoItem = ({ todo }) => {
 };
 
 const TodoList = () => {
-  const watchers = [];
-  const { refs, render } = html`
+  const { refs, render, mount } = html`
     <ul id="todoList">
       ${state.todos.map(todo => (
         TodoItem({ todo })
@@ -190,25 +183,29 @@ const TodoList = () => {
     </ul>
   `;
 
-  // Watch todos + update DOM
-  watchers.push(watch(state, 'todos', () => {
+  const reRenderTodos = () => {
     const fragment = new DocumentFragment();
     state.todos.forEach((todo) => {
       const { element } = TodoItem({ todo });
       element && fragment.appendChild(element);
     });
     refs.todoList?.replaceChildren(fragment);
-  }));
+  };
+
+  // Watch todos + update DOM
+  watch(state, 'todos', () => {
+    reRenderTodos();
+  });
+
+  // Hydrate TodoItems
+  mount(() => {
+    reRenderTodos();
+  });
 
   // Append todo in state
   setTimeout(() => {
     state.todos = [...state.todos, 'Todo 3'];
   }, 1000);
-
-  // Remove watchers on unmount
-  unmount(() => {
-    watchers.forEach(unwatch => unwatch());
-  });
 
   return render;
 };
@@ -245,7 +242,7 @@ const Component = () => {
 ## Roadmap 🚀
 - CLI tool
 - Minified version via CDN
+- Automatically hydrate child components
 - Cleaner way of referencing values in `html`
-- Automatically unwatch values when component unmounts
 - Adding value references to `refs` somehow?
 - Support CSS in JS

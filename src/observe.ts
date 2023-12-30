@@ -1,4 +1,5 @@
-import { Feather, Render, feather } from './render';
+import { feather } from './bridge';
+import { Feather, Render } from './render';
 
 export const hydrate = (render: Render, target = document.body) => {
 	if (typeof window === 'undefined') return;
