@@ -29,6 +29,15 @@ export class Render {
 
 	constructor(template: TemplateStringsArray, ...args: (string | number | Render)[]) {
 		const html = template.reduce((acc, part, i) => `${acc}${part}${args[i]?.toString() || ''}`, '');
+		const mount = () => {
+			window.__featherCurrentRender__ = undefined;
+			this[internal]._mounts?.forEach(mount => mount());
+			this[internal]._mounts = [];
+		};
+		const unmount = () => {
+			this[internal]._unmounts?.forEach(unmount => unmount());
+			this[internal]._unmounts = [];
+		};
 
 		if (typeof window !== 'undefined') {
 			window.__featherCurrentRender__ = this;
@@ -42,22 +51,14 @@ export class Render {
 				return acc;
 			}, this.refs);
 
-			const mount = () => {
-				window.__featherCurrentRender__ = undefined;
-				this[internal]._mounts?.forEach(mount => mount());
-				this[internal]._mounts = [];
-			};
-			const unmount = () => {
-				this[internal]._unmounts?.forEach(unmount => unmount());
-				this[internal]._unmounts = [];
-			};
 			for (let child of this.element.children) {
 				child[feather] = new Feather(mount, unmount);
 			}
 		}
 		this.toString = () => {
 			if (typeof window !== 'undefined') {
-				window.__featherCurrentRender__ = undefined;
+				mount();
+				unmount();
 			}
 			return html;
 		};

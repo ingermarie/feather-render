@@ -1,7 +1,7 @@
 # Feather Render
 ![gzip](https://img.shields.io/badge/gzip-646_bytes-green)
 ![license](https://img.shields.io/badge/license-ISC-blue)
-![version](https://img.shields.io/badge/npm-v1.1.1-blue)
+![version](https://img.shields.io/badge/npm-v1.1.2-blue)
 
 ✨ A feather light render framework ✨ 646 bytes minified and gzipped - no dependencies - SSR support
 
