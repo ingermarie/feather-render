@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.1.4
+- Update README.md
+
 ## v1.1.3
 - New: Minified and inlinable script (see example link in README.md)
 - Change: Move over to using regular functions instead of classes (smaller footprint)
