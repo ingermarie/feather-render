@@ -1,2 +1,2 @@
-export { hydrate } from './observe';
+export { hydrate } from './hydrate';
 export { Render, html } from './render';

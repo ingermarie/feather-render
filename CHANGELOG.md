@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.3
+- New: Minified and inlinable script (see example link in README.md)
+- Change: Move over to using regular functions instead of classes (smaller footprint)
+
 ## v1.1.2
 - Fix: Unset global render when mounting components as string
 

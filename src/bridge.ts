@@ -1,6 +1,7 @@
-import { Feather, Render } from './render';
+import { Render } from './render';
 
-export const feather = Symbol('feather');
+export const feather = Symbol();
+export const isClient = typeof window !== 'undefined';
 
 declare global {
 	interface Window {
@@ -10,3 +11,15 @@ declare global {
 		[feather]: Feather;
 	}
 }
+
+declare class Feather {
+	constructor(mount: () => void, unmount: () => void)
+	mount: () => void;
+	unmount: () => void;
+};
+function Feather(this: Feather, mount: () => void, unmount: () => void) {
+	this.mount = mount;
+	this.unmount = unmount;
+}
+
+export { Feather };

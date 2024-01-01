@@ -1,8 +1,8 @@
-import { feather } from './bridge';
-import { Feather, Render } from './render';
+import { Feather, feather, isClient } from './bridge';
+import { Render } from './render';
 
 export const hydrate = (render: Render, target = document.body) => {
-	if (typeof window === 'undefined') return;
+	if (!isClient) return;
 	if (!render.element) {
 		throw new Error('Render is missing element, are you trying to hydrate in a server environment?');
 	}

@@ -1,70 +1,66 @@
-import { feather } from './bridge';
+import { Feather, feather, isClient } from './bridge';
 
-const internal = Symbol('internal');
+type TemplateArg = string | number | Render;
 
-export class Feather {
-	constructor(
-		readonly mount: () => void,
-		readonly unmount: () => void,
-	) {}
+declare class Render {
+	constructor(template: TemplateStringsArray, ...args: TemplateArg[])
+	refs: Record<string, undefined | Element>;
+	element: undefined | DocumentFragment;
+	render: Render;
+	mount: (callback: () => void) => void;
+	unmount: (callback: () => void) => void;
 }
 
-export class Render {
-	render = this;
-	element: null | DocumentFragment = null;
-	refs: Record<string, undefined | Element> = {};
-	mount: (mountCallback: () => void) => void = (mountCallback) => {
-		this[internal]._mounts?.push(mountCallback);
+function Render(this: Render, template: TemplateStringsArray, ...args: TemplateArg[]) {
+	let mounts: (() => void)[] = [];
+	let unmounts: (() => void)[] = [];
+
+	const mount = () => {
+		window.__featherCurrentRender__ = undefined;
+		mounts.forEach(mount => mount());
+		mounts = [];
 	};
-	unmount: (unmountCallback: () => void) => void = (unmountCallback) => {
-		this[internal]._unmounts?.push(unmountCallback);
-	};
-	[internal]: {
-		_mounts?: (() => void)[];
-		_unmounts?: (() => void)[];
-	} = {
-		_mounts: [],
-		_unmounts: [],
+	const unmount = () => {
+		unmounts.forEach(unmount => unmount());
+		unmounts = [];
 	};
 
-	constructor(template: TemplateStringsArray, ...args: (string | number | Render)[]) {
-		const html = template.reduce((acc, part, i) => `${acc}${part}${args[i]?.toString() || ''}`, '');
-		const mount = () => {
-			window.__featherCurrentRender__ = undefined;
-			this[internal]._mounts?.forEach(mount => mount());
-			this[internal]._mounts = [];
-		};
-		const unmount = () => {
-			this[internal]._unmounts?.forEach(unmount => unmount());
-			this[internal]._unmounts = [];
-		};
+	const html = template.reduce((acc, part, i) => `${acc}${part}${args[i]?.toString() || ''}`, '');
 
-		if (typeof window !== 'undefined') {
-			window.__featherCurrentRender__ = this;
-			const templateEl = document.createElement('template');
-			templateEl.innerHTML = html;
+	this.render = this;
+	this.mount = (callback) => mounts.push(callback);
+	this.unmount = (callback) => unmounts.push(callback);
 
-			this.element = <DocumentFragment>templateEl.content.cloneNode(true);
-			this.refs = [...this.element.querySelectorAll('[id]')].reduce((acc, el) => {
-				const ref = el.getAttribute('id');
-				if (ref) (acc[ref] = el)
-				return acc;
-			}, this.refs);
-
-			for (let child of this.element.children) {
-				child[feather] = new Feather(mount, unmount);
-			}
-		}
-		this.toString = () => {
-			if (typeof window !== 'undefined') {
+	Object.defineProperty(this, 'toString', {
+		value: () => {
+			if (isClient) {
 				mount();
 				unmount();
 			}
 			return html;
-		};
+		}
+	});
+
+	if (isClient) {
+		window.__featherCurrentRender__ = this;
+		const templateEl = document.createElement('template');
+		templateEl.innerHTML = html;
+
+		this.element = <DocumentFragment>templateEl.content.cloneNode(true);
+		this.refs = [...this.element.querySelectorAll('[id]')].reduce((acc, el) => {
+			const ref = el.getAttribute('id');
+			if (ref) (acc[ref] = el)
+			return acc;
+		}, {} as Render['refs']);
+
+		for (let child of this.element.children) {
+			child[feather] = new Feather(mount, unmount);
+		}
 	}
 }
 
-export const html = (template: TemplateStringsArray, ...args: (string | number | Render)[]) => {
+export const html = (template: TemplateStringsArray, ...args: TemplateArg[]): Render => {
 	return new Render(template, ...args);
 };
+
+export { Render };

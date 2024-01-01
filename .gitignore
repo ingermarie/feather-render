@@ -2,3 +2,4 @@
 feather-render-*.tgz
 node_modules/
 dist/
+build/
