@@ -1,14 +1,13 @@
 import { Render } from './render';
 
-export const feather = Symbol();
 export const isClient = typeof window !== 'undefined';
 
 declare global {
 	interface Window {
 		__featherCurrentRender__?: Render;
 	}
-	interface Element {
-		[feather]: Feather;
+	interface Node {
+		__feather__?: Feather;
 	}
 }
 

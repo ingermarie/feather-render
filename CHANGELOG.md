@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.1.5
+- Improve: From 686 to 633 bytes minified and gzipped
+
 ## v1.1.4
 - Update README.md
 
