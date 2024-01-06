@@ -1,17 +1,16 @@
 {
   "name": "feather-render",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "A feather light render framework",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.mjs",
+  "types": "dist/cjs/index.d.ts",
   "files": [
-    "/dist"
+    "/dist",
+    "CHANGELOG.md"
   ],
   "scripts": {
-    "pack": "tsup --config config/tsup.config.ts",
-    "min": "tsup --config config/tsup.config.min.ts && gzip -c build/index.min.global.js | wc -c",
-    "build": "npm run pack && npm run min"
+    "build": "tsup && gzip -c dist/clean.global.js | wc -c"
   },
   "author": "ingermarien@gmail.com",
   "license": "ISC",

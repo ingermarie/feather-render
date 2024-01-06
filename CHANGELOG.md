@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.1.6
+- Package: Clean up file/folder structure and include CHANGELOG.md
+
 ## v1.1.5
 - Improve: From 686 to 633 bytes minified and gzipped
 
