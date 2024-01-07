@@ -1,27 +1,56 @@
 # Feather Render
-![gzip](https://img.shields.io/badge/gzip-629_bytes-green)
+![gzip](https://img.shields.io/badge/gzip-621_bytes-green)
 ![license](https://img.shields.io/badge/license-ISC-blue)
-![version](https://img.shields.io/badge/npm-v1.1.6-blue)
+![version](https://img.shields.io/badge/npm-v1.1.7-blue)
 
-✨ A feather light render framework ✨ 629 bytes minified and gzipped - no dependencies - SSR support
+✨ A feather light render framework ✨ 621 bytes minified and gzipped - no dependencies - SSR support
 
 Companion frameworks:
-- State - [feather-state](https://www.npmjs.com/package/feather-state)
-- State React - [feather-state-react](https://www.npmjs.com/package/feather-state-react)
+- [feather-state](https://www.npmjs.com/package/feather-state)
+- [feather-state-react](https://www.npmjs.com/package/feather-state-react)
 
 Live examples:
 - [Feather To-Do app](https://codesandbox.io/p/devbox/feather-to-do-app-k5ss8j)
 - [Feather To-Do app (inline)](https://codesandbox.io/p/devbox/feather-to-do-inline-4zt7ls)
 
-[![coffee](https://img.shields.io/badge/Buy_me_a_coffee%3F_❤️-724e2c)](https://www.paypal.com/paypalme/featherframework)
+[![coffee](https://img.shields.io/badge/Buy_me_a_coffee%3F_❤️-634832)](https://www.paypal.com/paypalme/featherframework)
 
 ## Getting started
+### Package
 ```
 npm i feather-render
 ```
 
+### ...or inline
+```html
+<head>
+  <script src="feather-render.min.js"></script>
+</head>
+<body>
+  <script>
+    const { html, hydrate } = window.__feather__ || {};
+  </script>
+</body>
+```
+
+## Index
+Usage
+- [Basic syntax](#basic-syntax)
+- [Server-Side Rendering (SSR)](#server-side-rendering-ssr)
+- [Client hydration](#client-hydration)
+
+Documentation
+- [`html()`](#html)
+- [`hydrate()`](#hydrate)
+
+Examples
+- [Re-rendering](#re-rendering)
+- [Event listeners](#event-listeners)
+- [Fetching](#fetching)
+
 ## Usage
-```typescript
+### Basic syntax
+```ts
 import { html } from 'feather-render';
 
 const TodoItem = ({ todo }) => {
@@ -52,27 +81,28 @@ const Document = () => html`
   </html>
 `;
 ```
-Plugins for VSCode like lit-html or Inline HTML can be used to get syntax highlighting.
+Tip: Plugins for VSCode like lit-html or Inline HTML can be used for syntax highlighting.
 
-### SSR (Server-Side Rendering)
-```typescript
+### Server-Side Rendering (SSR)
+```ts
 import express from 'express';
-import { Document } from './Document.js';
+import { Document } from './components/Document';
 
 const server = express();
 
-server.use('/', (req, res) => {
-  if (req.url === '/index.js') {
-    return res.status(200).sendFile(req.url, { root: './dist' });
-  }
-  res.status(200).send(Document().toString());
-});
+server
+    .get('/', (req, res) => {
+        res.send(Document().toString());
+    })
+    .get('/index.js', (req, res) => {
+        res.sendFile(req.url, { root: './dist' });
+    });
 
 server.listen(5000);
 ```
 
-### DOM hydration
-```typescript
+### Client hydration
+```ts
 import { hydrate } from 'feather-render';
 import { TodoList } from './components/TodoList.js';
 
@@ -81,9 +111,10 @@ hydrate(TodoList(), document.body);
 
 ## Documentation
 ### `html()`
-```typescript
-html`<div>...</div>` => { refs, render, mount(), unmount() }
+```ts
+const { refs, render, mount, unmount } = html`<div></div>`;
 ```
+
 #### Parameters
 - `string` - html template string to render
 
@@ -93,11 +124,11 @@ html`<div>...</div>` => { refs, render, mount(), unmount() }
 - `mount()` - run callback on mount
 - `unmount()` - run callback on unmount
 
----
-
 ### `html().mount()`
-```typescript
-mount(() => void) => void;
+```ts
+mount(() => {
+  console.log('Component inserted in DOM');
+});
 ```
 #### Parameters
 - `callback()` - function called when component is inserted in DOM
@@ -105,23 +136,21 @@ mount(() => void) => void;
 #### Return value
 - `void`
 
----
-
 ### `html().unmount()`
-```typescript
-unmount(() => void) => void;
+```ts
+unmount(() => {
+  console.log('Component removed from DOM');
+});
 ```
 #### Parameters
-- `callback()` - function called after component is removed from DOM.
+- `callback()` - function called after component is removed from DOM
 
 #### Return value
 - `void`
 
----
-
 ### `hydrate()`
-```typescript
-(element: Render, target: HTMLElement) => void;
+```ts
+hydrate(App(), document.body);
 ```
 #### Parameters
 - `element` - `Render` from `html()`
@@ -131,9 +160,19 @@ unmount(() => void) => void;
 - `void`
 
 ## Examples
+- Re-rendering
+  - [Primitive values](#primitive-values)
+  - [Lists](#lists)
+- Event listeners
+  - [Form submission](#form-submission)
+- Fetching
+  - [Server and client](#server-and-client)
+  - [Server or client](#server-or-client)
+  - [On mount](#on-mount)
+
 ### Re-rendering
 #### Primitive values
-```typescript
+```ts
 import { store } from 'feather-state';
 import { html } from 'feather-render';
 
@@ -148,7 +187,7 @@ const Component = () => {
 
   // Watch greeting + update DOM
   watch(state, 'greeting', (next) => {
-    refs.paragraph.textContent = next;
+    refs.paragraph?.replaceChildren(next);
   });
 
   // Change greeting state
@@ -161,7 +200,7 @@ const Component = () => {
 ```
 
 #### Lists
-```typescript
+```ts
 import { store } from 'feather-state';
 import { html } from 'feather-render';
 
@@ -186,10 +225,10 @@ const TodoList = () => {
 
   const reRenderTodos = () => {
     const fragment = new DocumentFragment();
-    state.todos.forEach((todo) => {
+    for (let todo of todoStore.todos) {
       const { element } = TodoItem({ todo });
       element && fragment.appendChild(element);
-    });
+    }
     refs.todoList?.replaceChildren(fragment);
   };
 
@@ -213,7 +252,8 @@ const TodoList = () => {
 ```
 
 ### Event listeners
-```typescript
+#### Form submission
+```ts
 import { html } from 'feather-render';
 
 const Component = () => {
@@ -225,8 +265,9 @@ const Component = () => {
     </form>
   `;
 
-  const handleSubmit = () => {
-    refs.status.textContent = 'Submitting';
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    refs.status?.replaceChildren('Submitting');
   };
 
   mount(() => {
@@ -240,10 +281,63 @@ const Component = () => {
 };
 ```
 
+### Fetching
+#### Server and client
+```ts
+const App = () => {
+  const { render } = html``;
+
+  fetch('http://localhost:5000/api/v1/user')
+		.then(res => res.json())
+		.then(res => console.log(res));
+
+  return render;
+};
+```
+
+#### Server or client
+```ts
+const isServer = () => typeof window === 'undefined';
+const isClient = () => typeof window !== 'undefined';
+
+const App = () => {  
+  const { render } = html``;
+
+  if (isServer()) {
+    fetch('http://localhost:5000/api/v1/user')
+      .then(res => res.json())
+      .then(res => console.log(res));
+  }
+
+  if (isClient()) {
+    fetch('http://localhost:5000/api/v1/user')
+      .then(res => res.json())
+      .then(res => console.log(res));
+  }
+
+  return render;
+};
+```
+
+#### On mount
+```ts
+const App = () => {
+  const { render, mount } = html``;
+
+  mount(() => {
+    fetch('http://localhost:5000/api/v1/user')
+      .then(res => res.json())
+      .then(res => console.log(res));
+  });
+
+  return render;
+};
+```
+
 ## Roadmap 🚀
 - CLI tool
-- Minified version via CDN
 - Automatically hydrate child components
 - Cleaner way of referencing values in `html`
-- Adding value references to `refs` somehow?
-- Support CSS in JS
+- Binding values, re-renders and listeners
+- Lazy and suspense components
+- CSS in JS examples

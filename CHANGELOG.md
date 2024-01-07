@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.1.7
+- Update README.md
+
 ## v1.1.6
 - Package: Clean up file/folder structure and include CHANGELOG.md
 

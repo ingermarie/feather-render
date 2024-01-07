@@ -10,12 +10,19 @@ const baseConfigMin: Options = {
 };
 const configMinMeasure: Options = {
   ...baseConfigMin,
-  entry: {'clean': 'src/index.min.ts'}
+  entry: {'size': 'src/index.min.ts'},
+  outDir: 'temp',
+  esbuildOptions(opts) {
+    opts.outExtension = { '.js': '.js' };
+  }
 };
 const configMin: Options = {
   ...baseConfigMin,
-  entry: {'min': 'src/index.min.ts'},
-  sourcemap: true
+  entry: {'feather-render': 'src/index.min.ts'},
+  sourcemap: true,
+  esbuildOptions(opts) {
+    opts.outExtension = { '.js': '.min.js' };
+  }
 };
 
 const baseConfig: Options = {
