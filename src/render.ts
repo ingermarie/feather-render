@@ -58,6 +58,18 @@ function Render(this: Render, template: TemplateStringsArray, ...args: TemplateA
 	});
 }
 
+/**
+ * Create a new instance of `Render`
+ * @param template {TemplateStringsArray} - Template string array
+ * @param args {TemplateArg[]} - Template arguments
+ * @returns {Render}
+ * @example
+ * import { html } from 'feather-render';
+ *
+ * const Component = ({ name }) => html`
+ * 	<div>Hello, ${name}!</div>
+ * `;
+ */
 export const html = (template: TemplateStringsArray, ...args: TemplateArg[]): Render => {
 	return new Render(template, ...args);
 };

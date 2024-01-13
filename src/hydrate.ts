@@ -1,6 +1,19 @@
 import { Feather, isClient } from './bridge';
 import { Render } from './render';
 
+/**
+ * Hydrate a `Render` element produced by ``` html`` ```
+ * @param render {Render} - Instance of `Render`
+ * @param {HTMLElement} [target=document.body] - Where to hydrate the render element
+ * @returns {void}
+ * @example
+ * import { html, hydrate } from 'feather-render';
+ *
+ * const Component = () => html`
+ * 	<div>Hello, World!</div>
+ * `;
+ * hydrate(Component(), document.body);
+ */
 export const hydrate = (render: Render, target = document.body): void => {
 	if (!isClient) return;
 	if (!render.element) {

@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.1.9
+- Add JSDoc
+
 ## v1.1.8
 - Update README.md - add examples for lazy / suspense
 
