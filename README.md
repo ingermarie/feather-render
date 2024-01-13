@@ -1,7 +1,7 @@
 # Feather Render
 ![gzip](https://img.shields.io/badge/gzip-621_bytes-green)
 ![license](https://img.shields.io/badge/license-ISC-blue)
-![version](https://img.shields.io/badge/npm-v1.1.7-blue)
+![version](https://img.shields.io/badge/npm-v1.1.8-blue)
 
 ✨ A feather light render framework ✨ 621 bytes minified and gzipped - no dependencies - SSR support
 
@@ -47,6 +47,8 @@ Examples
 - [Re-rendering](#re-rendering)
 - [Event listeners](#event-listeners)
 - [Fetching](#fetching)
+- [Lazy / Suspense](#lazy--suspense)
+- [Unique id's](#unique-ids)
 
 ## Usage
 ### Basic syntax
@@ -94,9 +96,7 @@ server
     .get('/', (req, res) => {
         res.send(Document().toString());
     })
-    .get('/index.js', (req, res) => {
-        res.sendFile(req.url, { root: './dist' });
-    });
+    .use(express.static('dist'));
 
 server.listen(5000);
 ```
@@ -169,6 +169,9 @@ hydrate(App(), document.body);
   - [Server and client](#server-and-client)
   - [Server or client](#server-or-client)
   - [On mount](#on-mount)
+- Other
+  - [Lazy / Suspense](#lazy--suspense)
+  - [Unique id's](#unique-ids)
 
 ### Re-rendering
 #### Primitive values
@@ -288,8 +291,8 @@ const App = () => {
   const { render } = html``;
 
   fetch('http://localhost:5000/api/v1/user')
-		.then(res => res.json())
-		.then(res => console.log(res));
+    .then(res => res.json())
+    .then(res => console.log(res));
 
   return render;
 };
@@ -334,10 +337,52 @@ const App = () => {
 };
 ```
 
+### Other
+#### Lazy / Suspense
+```ts
+const App = () => {
+  const { render } = html`
+    <div id="lazyParent"></div>
+  `;
+
+  import('./LazyComponent').then(({ LazyComponent }) => {
+    const { element } = LazyComponent();
+    element && refs.lazyParent?.replaceChildren(element);
+  });
+
+  return render;
+};
+```
+
+#### Unique id's
+```ts
+let i = 0;
+export function id(name: string) {
+  return `${name}_${i++}`;
+}
+```
+
+```ts
+import { id } from '../helpers/id';
+
+const App = () => {
+  const uniqueId = id('unique');
+
+  const { refs, render, mount } = html`
+    <div id=${uniqueId}></div>
+  `;
+
+  mount(() => {
+    refs[uniqueId]?.replaceChildren('Component mounted');
+  });
+
+  return render;
+};
+```
+
 ## Roadmap 🚀
 - CLI tool
 - Automatically hydrate child components
 - Cleaner way of referencing values in `html`
 - Binding values, re-renders and listeners
-- Lazy and suspense components
 - CSS in JS examples
