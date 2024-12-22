@@ -48,13 +48,7 @@ function Render(this: Render, template: TemplateStringsArray, ...args: TemplateA
 	}
 
 	Object.defineProperty(this, 'toString', {
-		value: () => {
-			if (isClient) {
-				mount();
-				unmount();
-			}
-			return html;
-		}
+		value: () => html,
 	});
 }
 

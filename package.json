@@ -1,6 +1,6 @@
 {
   "name": "feather-render",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "description": "A feather light render framework",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.mjs",
@@ -10,6 +10,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
+    "dev": "tsup --watch",
     "build": "tsup && gzip -c temp/size.js | wc -c"
   },
   "author": "ingermarien@gmail.com",

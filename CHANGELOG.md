@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.1.10
+- Fix unwanted mount/unmount in client
+
 ## v1.1.9
 - Add JSDoc
 
