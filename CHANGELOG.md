@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.2.0
+- Automatic nested Render hydration
+- Add support for `undefined` and `arrays` in html
+
 ## v1.1.10
 - Fix unwanted mount/unmount in client
 

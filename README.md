@@ -1,7 +1,7 @@
 # Feather Render
-![gzip](https://img.shields.io/badge/gzip-610_bytes-green)
+![gzip](https://img.shields.io/badge/gzip-764_bytes-green)
 ![license](https://img.shields.io/badge/license-ISC-blue)
-![version](https://img.shields.io/badge/npm-v1.1.10-blue)
+![version](https://img.shields.io/badge/npm-v1.2.0-blue)
 
 ✨ A feather light render framework ✨ 621 bytes minified and gzipped - no dependencies - SSR support
 
@@ -63,7 +63,7 @@ const TodoItem = ({ todo }) => {
 
 const TodoList = () => {
   return html`
-    <ul>${todos.map(todo => TodoItem({ todo })).join('')}</ul>
+    <ul>${todos.map(todo => TodoItem({ todo }))}</ul>
   `;
 };
 
@@ -218,11 +218,11 @@ const TodoItem = ({ todo }) => {
 };
 
 const TodoList = () => {
-  const { refs, render, mount } = html`
+  const { refs, render } = html`
     <ul id="todoList">
       ${state.todos.map(todo => (
         TodoItem({ todo })
-      )).join('')}
+      ))}
     </ul>
   `;
 
@@ -237,11 +237,6 @@ const TodoList = () => {
 
   // Watch todos + update DOM
   watch(state, 'todos', () => {
-    reRenderTodos();
-  });
-
-  // Hydrate TodoItems
-  mount(() => {
     reRenderTodos();
   });
 

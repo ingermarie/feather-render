@@ -1,6 +1,6 @@
 {
   "name": "feather-render",
-  "version": "1.1.10",
+  "version": "1.2.0",
   "description": "A feather light render framework",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.mjs",
@@ -15,6 +15,10 @@
   },
   "author": "ingermarien@gmail.com",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ingermarie/feather-render.git"
+  },
   "devDependencies": {
     "terser": "^5.26.0",
     "tsup": "^8.0.1"
