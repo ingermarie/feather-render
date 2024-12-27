@@ -1,6 +1,6 @@
 {
   "name": "feather-render",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A feather light render framework",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.mjs",

@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.2.1
+- Add render handling for supported array value types
+
 ## v1.2.0
 - Automatic nested Render hydration
 - Add support for `undefined` and `arrays` in html

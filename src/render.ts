@@ -1,6 +1,6 @@
 import { Feather, isClient } from './bridge';
 
-type TemplateArg = undefined | number | string | Render | unknown[];
+type TemplateArg = undefined | false | number | string | Render | TemplateArg[];
 
 declare class Render {
 	constructor(template: TemplateStringsArray, ...args: TemplateArg[])
@@ -24,7 +24,8 @@ function Render(this: Render, template: TemplateStringsArray, ...args: TemplateA
 	this.mount = (callback) => mounts.push(callback);
 	this.unmount = (callback) => unmounts.push(callback);
 
-	const argToString = (arg: TemplateArg): number | string | Render => Array.isArray(arg) ? arg.join('') : arg || typeof arg === 'number' ? arg : '';
+	const arrToString = (arr: TemplateArg[]): number | string | Render => arr.reduce((acc: number | string | Render, arg) => `${acc}${argToString(arg)}`, '');
+	const argToString = (arg: TemplateArg): number | string | Render => Array.isArray(arg) ? arrToString(arg) : arg || typeof arg === 'number' ? arg : '';
 	const html = template.reduce((acc, part, i) => `${acc}${part}${argToString(args[i])}`, '');
 
 	const mount = () => {
