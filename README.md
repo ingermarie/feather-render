@@ -377,7 +377,6 @@ const App = () => {
 
 ## Roadmap 🚀
 - CLI tool
-- Automatically hydrate child components
 - Cleaner way of referencing values in `html`
 - Binding values, re-renders and listeners
 - CSS in JS examples

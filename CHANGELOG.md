@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.2.2
+- Update README.md roadmap
+
 ## v1.2.1
 - Add render handling for supported array value types
 
