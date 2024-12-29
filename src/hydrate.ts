@@ -1,4 +1,4 @@
-import { Feather, isClient } from './bridge';
+import { isClient } from './bridge';
 import { Render } from './render';
 
 /**
@@ -19,18 +19,16 @@ export const hydrate = (render: Render, target = document.body): void => {
 	if (!render.element) {
 		throw new Error('Render element is missing, hydrating outside browser?');
 	}
+	const recMutationHandler = (nodeList: NodeList, methodName: 'mount' | 'unmount') => {
+		for (let node of nodeList) {
+			node.__feather__?.[methodName]();
+			recMutationHandler(node.childNodes, methodName);
+		}
+	};
 	new MutationObserver((mutations) => {
 		for (let mutation of mutations) {
-			for (let removedNode of mutation.removedNodes) {
-				if (removedNode.__feather__ instanceof Feather) {
-					removedNode.__feather__.unmount();
-				}
-			}
-			for (let addedNode of mutation.addedNodes) {
-				if (addedNode.__feather__ instanceof Feather) {
-					addedNode.__feather__.mount();
-				}
-			}
+			recMutationHandler(mutation.removedNodes, 'unmount');
+			recMutationHandler(mutation.addedNodes, 'mount');
 		}
 	}).observe(target, { childList: true, subtree: true });
 

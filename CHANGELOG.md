@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.2.3
+- Fix nested render mounts/unmounts
+
 ## v1.2.2
 - Update README.md roadmap
 
