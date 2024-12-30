@@ -14,10 +14,10 @@ import { Render } from './render';
  * `;
  * hydrate(Component(), document.body);
  */
-export const hydrate = (render: Render, target = document.body): void => {
+export const hydrate = (render: Render, target: Element): void => {
 	if (!isClient) return;
 	if (!render.element) {
-		throw new Error('Render element is missing, hydrating outside browser?');
+		throw new Error('Render element missing.');
 	}
 	const recMutationHandler = (nodeList: NodeList, methodName: 'mount' | 'unmount') => {
 		for (let node of nodeList) {

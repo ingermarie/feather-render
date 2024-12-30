@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.3.0
+- Add `FR` (sync) and `FP` (async) types for components
+- Add docs on async components
+- Add docs on CSS in JS
+
 ## v1.2.3
 - Fix nested render mounts/unmounts
 

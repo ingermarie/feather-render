@@ -1,22 +1,15 @@
-import { Render } from './render';
-
 export const isClient = typeof window !== 'undefined';
 
-declare global {
-	interface Window {
-		__featherCurrentRender__?: Render;
-	}
-	interface Node {
-		__feather__?: Feather;
-	}
-}
+type Mount = () => void;
+type Unmount = () => void;
 
 declare class Feather {
-	constructor(mount: () => void, unmount: () => void)
-	mount: () => void;
-	unmount: () => void;
-};
-function Feather(this: Feather, mount: () => void, unmount: () => void) {
+	constructor(mount: Mount, unmount: Unmount)
+	mount: Mount;
+	unmount: Unmount;
+}
+
+function Feather(this: Feather, mount: Mount, unmount: Unmount) {
 	this.mount = mount;
 	this.unmount = unmount;
 }

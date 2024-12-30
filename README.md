@@ -1,9 +1,9 @@
 # Feather Render
-![gzip](https://img.shields.io/badge/gzip-764_bytes-green)
+![gzip](https://img.shields.io/badge/gzip-707_bytes-green)
 ![license](https://img.shields.io/badge/license-ISC-blue)
-![version](https://img.shields.io/badge/npm-v1.2.3-blue)
+![version](https://img.shields.io/badge/npm-v1.3.0-blue)
 
-✨ A feather light render framework ✨ 772 bytes minified and gzipped - no dependencies - SSR support
+✨ A feather light render framework ✨ 707 bytes minified and gzipped - no dependencies - SSR support
 
 Companion frameworks:
 - [feather-state](https://www.npmjs.com/package/feather-state)
@@ -43,31 +43,38 @@ Documentation
 - [`html()`](#html)
 - [`hydrate()`](#hydrate)
 
+Definitions
+- [`Render`](#render)
+- [`FR`](#fr) / [`FP`](#fp)
+
 Examples
 - [Re-rendering](#re-rendering)
 - [Event listeners](#event-listeners)
 - [Fetching](#fetching)
+- [Async components](#async-components)
 - [Lazy / Suspense](#lazy--suspense)
 - [Unique id's](#unique-ids)
+- [CSS in JS](#css-in-js)
 
 ## Usage
 ### Basic syntax
 ```ts
-import { html } from 'feather-render';
+import { FR, html } from 'feather-render';
+import { TodoItemProps } from './TodoItem.types';
 
-const TodoItem = ({ todo }) => {
+const TodoItem: FR<TodoItemProps> = ({ todo }) => {
   return html`
     <li>${todo.title}</li>
   `;
 };
 
-const TodoList = () => {
+const TodoList: FR = () => {
   return html`
     <ul>${todos.map(todo => TodoItem({ todo }))}</ul>
   `;
 };
 
-const Document = () => html`
+const Document: FR = () => html`
   <!DOCTYPE html>
   <html lang="en">
     <head>
@@ -75,7 +82,7 @@ const Document = () => html`
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Feather</title>
-      <script type="module" src="index.js"></script>
+      <script type="module" src="index.mjs"></script>
     </head>
     <body>
       ${TodoList()}
@@ -92,11 +99,12 @@ import { Document } from './components/Document';
 
 const server = express();
 
-server
-    .get('/', (req, res) => {
-        res.send(Document().toString());
-    })
-    .use(express.static('dist'));
+server.use(express.static('dist'));
+
+server.get('/', (req, res) => {
+  const document = Document({ req });
+  res.send(document.toString());
+});
 
 server.listen(5000);
 ```
@@ -112,17 +120,14 @@ hydrate(TodoList(), document.body);
 ## Documentation
 ### `html()`
 ```ts
-const { refs, render, mount, unmount } = html`<div></div>`;
+const render = html`<div></div>`;
 ```
 
 #### Parameters
 - `string` - html template string to render
 
-#### Return value: `Render`
-- `refs` - list of id'ed elements
-- `render` - return of functional component
-- `mount()` - run callback on mount
-- `unmount()` - run callback on unmount
+#### Return value
+- [`Render`](#render)
 
 ### `html().mount()`
 ```ts
@@ -153,11 +158,53 @@ unmount(() => {
 hydrate(App(), document.body);
 ```
 #### Parameters
-- `element` - `Render` from `html()`
-- `target` - where to mount the DOM
+- `element` - [`Render`](#render) from [`html()`](#html)
+- `target` - where to mount the element
 
 #### Return value
 - `void`
+
+## Definitions
+### `Render`
+Return from [`html()`](#html)
+
+```ts
+const { refs, render, element, mount, unmount } = html`<div></div>`;
+```
+
+- `refs` - list of id'ed elements
+- `render` - `this`
+- `element` - element to insert in DOM
+- [`mount()`](#htmlmount) - set callback for mount
+- [`unmount()`](#htmlunmount) - set callback for unmount
+
+### `FR`
+Feather Render
+
+```ts
+const Page: FR<Props> = (props) => {
+  return html`
+    <main>
+      ${props.title}
+    </main>
+  `;
+};
+```
+
+### `FP`
+Feather Render Promise
+
+```ts
+const Page: FP<Props> = async (props) => {
+  const pageData = await fetchPageData(props);
+
+  return html`
+    <main>
+      ${pageData.title}
+    </main>
+  `;
+};
+```
 
 ## Examples
 - Re-rendering
@@ -170,20 +217,22 @@ hydrate(App(), document.body);
   - [Server or client](#server-or-client)
   - [On mount](#on-mount)
 - Other
+  - [Async components](#async-components)
   - [Lazy / Suspense](#lazy--suspense)
   - [Unique id's](#unique-ids)
+  - [CSS in JS](#css-in-js)
 
 ### Re-rendering
 #### Primitive values
 ```ts
 import { store } from 'feather-state';
-import { html } from 'feather-render';
+import { FR, html } from 'feather-render';
 
 const { watch, ...state } = store({
   greeting: 'Hello, World'
 });
 
-const Component = () => {
+const Component: FR = () => {
   const { refs, render } = html`
     <p id="paragraph">${state.greeting}</p>
   `;
@@ -205,19 +254,20 @@ const Component = () => {
 #### Lists
 ```ts
 import { store } from 'feather-state';
-import { html } from 'feather-render';
+import { FR, html } from 'feather-render';
+import { TodoItemProps } from './TodoItem.types';
 
 const { watch, ...state  } = store({
   todos: ['Todo 1', 'Todo 2'];
 });
 
-const TodoItem = ({ todo }) => {
+const TodoItem: FR<TodoItemProps> = ({ todo }) => {
   return html`
     <li>${todo}</ul>
   `;
 };
 
-const TodoList = () => {
+const TodoList: FR = () => {
   const { refs, render } = html`
     <ul id="todoList">
       ${state.todos.map(todo => (
@@ -252,9 +302,9 @@ const TodoList = () => {
 ### Event listeners
 #### Form submission
 ```ts
-import { html } from 'feather-render';
+import { FR, html } from 'feather-render';
 
-const Component = () => {
+const Component: FR = () => {
   const { refs, render, mount, unmount } = html`
     <form id="form">
       <p id="status">Fill in form</p>
@@ -279,10 +329,81 @@ const Component = () => {
 };
 ```
 
+### Async components
+#### Server
+```ts
+import express from 'express';
+import { Document } from './components/Document';
+
+const server = express();
+
+server.get('/', async (req, res) => {
+  const document = await Document({ req });
+  res.send(document.toString());
+});
+
+server.listen(5000);
+```
+
+#### Client hydration
+```ts
+import { hydrate } from 'feather-render';
+import { fetchPage } from './Document.helpers';
+
+fetchPage('/').then(page => {
+  hydrate(page, document.body);
+});
+```
+
+#### Document helper
+```ts
+import { Render } from 'feather-render';
+import { ErrorPage } from './ErrorPage';
+import { Page } from './Page';
+
+export const fetchPage = async (path: string): Promise<Render> => {
+  try {
+    const pageData = await (await fetch(`/api/page${path}`)).json();
+    return pageData ? Page({ pageData }) : ErrorPage({ code: 404 });
+  } catch {
+    return ErrorPage({ code: 500 });
+  }
+};
+```
+
+#### Document
+```ts
+import { Request } from 'express';
+import { FP, html } from 'feather-render';
+import { fetchPage } from './Document.helpers';
+
+type Props = {
+  req: Request;
+};
+
+const Document: FP<Props> = async ({ req }) => html`
+  <!doctype html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feather</title>
+    <script type="module" src="/index.mjs"></script>
+  </head>
+  <body>
+    ${await fetchPage({ path: req.path })}
+  </body>
+  </html>
+`;
+```
+
 ### Fetching
 #### Server and client
 ```ts
-const App = () => {
+import { FR, html } from 'feather-render';
+
+const App: FR = () => {
   const { render } = html``;
 
   fetch('http://localhost:5000/api/v1/user')
@@ -295,10 +416,12 @@ const App = () => {
 
 #### Server or client
 ```ts
+import { FR, html } from 'feather-render';
+
 const isServer = () => typeof window === 'undefined';
 const isClient = () => typeof window !== 'undefined';
 
-const App = () => {  
+const App: FR = () => {
   const { render } = html``;
 
   if (isServer()) {
@@ -319,7 +442,9 @@ const App = () => {
 
 #### On mount
 ```ts
-const App = () => {
+import { FR, html } from 'feather-render';
+
+const App: FR = () => {
   const { render, mount } = html``;
 
   mount(() => {
@@ -332,10 +457,11 @@ const App = () => {
 };
 ```
 
-### Other
-#### Lazy / Suspense
+### Lazy / Suspense
 ```ts
-const App = () => {
+import { FR, html } from 'feather-render';
+
+const App: FR = () => {
   const { render } = html`
     <div id="lazyParent"></div>
   `;
@@ -349,7 +475,7 @@ const App = () => {
 };
 ```
 
-#### Unique id's
+### Unique id's
 ```ts
 let i = 0;
 export function id(name: string) {
@@ -358,9 +484,10 @@ export function id(name: string) {
 ```
 
 ```ts
+import { FR, html } from 'feather-render';
 import { id } from '../helpers/id';
 
-const App = () => {
+const App: FR = () => {
   const uniqueId = id('unique');
 
   const { refs, render, mount } = html`
@@ -375,8 +502,53 @@ const App = () => {
 };
 ```
 
+### CSS in JS
+#### Components
+```ts
+import { FR, html } from 'feather-render';
+import { css } from '@emotion/css';
+
+const Page: FR = () => html`
+  <main class=${css`background: red;`}>
+  </main>
+`;
+```
+
+#### Server-Side Rendering (SSR)
+```ts
+import { FR, html } from 'feather-render';
+import createEmotionServer from '@emotion/server/create-instance';
+import { cache } from '@emotion/css';
+import { Page } from './Page';
+
+const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(cache);
+
+const Document: FR = () => {
+  const page = Page();
+  const chunks = extractCriticalToChunks(page.toString());
+  const styles = constructStyleTagsFromChunks(chunks);
+
+  return html`
+    <!doctype html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Feather</title>
+      <script type="module" src="/index.mjs"></script>
+      ${styles}
+    </head>
+    <body>
+      ${page}
+    </body>
+    </html>
+  `;
+};
+```
+
 ## Roadmap 🚀
 - CLI tool
 - Cleaner way of referencing values in `html`
 - Binding values, re-renders and listeners
-- CSS in JS examples
+- Router example

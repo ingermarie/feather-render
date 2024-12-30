@@ -29,19 +29,19 @@ function Render(this: Render, template: TemplateStringsArray, ...args: TemplateA
 	const html = template.reduce((acc, part, i) => `${acc}${part}${argToString(args[i])}`, '');
 
 	const mount = () => {
-		window.__featherCurrentRender__ = undefined;
-		unrendered.forEach(render => {
+		window.__featherCurrentRender__ = null;
+		for (let render of unrendered.reverse()) {
 			const domNode = document.querySelector(`#feather-${render.id}`);
 			if (domNode?.parentElement && render.element) {
 				domNode.parentElement.replaceChild(render.element, domNode);
 			}
-		});
+		};
 		unrendered = [];
-		mounts.forEach(mount => mount());
+		for (let mount of mounts) mount();
 		mounts = [];
 	};
 	const unmount = () => {
-		unmounts.forEach(unmount => unmount());
+		for (let unmount of unmounts) unmount();
 		unmounts = [];
 	};
 
@@ -50,25 +50,23 @@ function Render(this: Render, template: TemplateStringsArray, ...args: TemplateA
 		const templateEl = document.createElement('template');
 		templateEl.innerHTML = html;
 
-		this.element = <DocumentFragment>templateEl.content.cloneNode(true);
+		this.element = templateEl.content;
 
 		for (let el of this.element.querySelectorAll('[id]')) {
 			this.refs[el.id] = el;
 		}
 		for (let child of this.element.children) {
-			child.__feather__ = new Feather(mount, child.id.startsWith('feather-') ? () => {} : unmount);
+			child.__feather__ = new Feather(mount, child.id.match(/^feather-/) ? () => {} : unmount);
 		}
 	}
 
-	Object.defineProperty(this, 'toString', {
-		value: () => {
-			if (isClient) {
-				unrendered.unshift(this);
-				return `<template id="feather-${this.id}"></template>`;
-			}
-			return html;
-		},
-	});
+	this.toString = () => {
+		if (isClient) {
+			unrendered.push(this);
+			return `<template id="feather-${this.id}"></template>`;
+		}
+		return html;
+	};
 	id++;
 }
 
