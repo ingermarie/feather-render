@@ -1,0 +1,15 @@
+{
+	"$schema": "https://typedoc.org/schema.json",
+	"entryPoints": ["./src/index.ts"],
+	"out": "temp",
+	"plugin": ["typedoc-plugin-markdown"],
+	"groupOrder": ["Functions", "Classes"],
+	"outputFileStrategy": "modules",
+	"readme": "none",
+	"cleanOutputDir": false,
+	"hidePageHeader": true,
+	"hideBreadcrumbs": true,
+	"hidePageTitle": true,
+	"useCodeBlocks": false, // TODO
+	"disableSources": true,
+}
