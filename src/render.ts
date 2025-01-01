@@ -4,11 +4,49 @@ export type RenderArg = undefined | false | number | string | Render | RenderArg
 
 declare class Render {
 	constructor(template: TemplateStringsArray, ...args: RenderArg[])
+	/**
+	 * @internal */
 	id: number;
+	/**
+	 * ID'ed elements from template
+	 * @example
+	 * const { refs } = html`<div id="myDiv"></div>`;
+	 * 
+	 * refs.myDiv; // <div id="myDiv"></div> */
 	refs: Record<string, undefined | Element>;
+	/**
+	 * Element to insert in DOM
+	 * @example
+	 * const { element } = html`<div></div>`;
+	 * 
+	 * parent.appendChild(element); */
 	element: undefined | DocumentFragment;
+	/**
+	 * Self reference to `Render` instance from `html`
+	 * @example
+	 * const res = html`<div></div>`;
+	 * 
+	 * res === res.render; // true */
 	render: Render;
+	/**
+	 * Mount callback
+	 * @param callback - Function called after component is inserted in DOM
+	 * @example
+	 * const { mount } = html`<div></div>`;
+	 * 
+	 * mount(() => {
+	 *   console.log('Component inserted in DOM');
+	 * }); */
 	mount: (callback: () => void) => void;
+	/**
+	 * Unmount callback
+	 * @param callback - Function called after component is removed from DOM
+	 * @example
+	 * const { unmount } = html`<div></div>`;
+	 * 
+	 * unmount(() => {
+	 *   console.log('Component removed from DOM');
+	 * }); */
 	unmount: (callback: () => void) => void;
 }
 

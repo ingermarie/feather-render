@@ -3,13 +3,16 @@
 	"entryPoints": ["./src/index.ts"],
 	"out": "temp",
 	"plugin": ["typedoc-plugin-markdown"],
+	"sort": ["source-order"],
 	"groupOrder": ["Functions", "Classes"],
 	"outputFileStrategy": "modules",
 	"readme": "none",
+	"parametersFormat": "table",
 	"cleanOutputDir": false,
 	"hidePageHeader": true,
 	"hideBreadcrumbs": true,
 	"hidePageTitle": true,
 	"useCodeBlocks": false, // TODO
 	"disableSources": true,
+	"excludeInternal": true,
 }
