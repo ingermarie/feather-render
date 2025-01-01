@@ -1,9 +1,9 @@
 import { Feather, isClient } from './bridge';
 
-type TemplateArg = undefined | false | number | string | Render | TemplateArg[];
+export type RenderArg = undefined | false | number | string | Render | RenderArg[];
 
 declare class Render {
-	constructor(template: TemplateStringsArray, ...args: TemplateArg[])
+	constructor(template: TemplateStringsArray, ...args: RenderArg[])
 	id: number;
 	refs: Record<string, undefined | Element>;
 	element: undefined | DocumentFragment;
@@ -14,7 +14,7 @@ declare class Render {
 
 let id = 0;
 let unrendered: Record<string, Render> = {};
-function Render(this: Render, template: TemplateStringsArray, ...args: TemplateArg[]) {
+function Render(this: Render, template: TemplateStringsArray, ...args: RenderArg[]) {
 	let mounts: (() => void)[] = [];
 	let unmounts: (() => void)[] = [];
 
@@ -24,8 +24,8 @@ function Render(this: Render, template: TemplateStringsArray, ...args: TemplateA
 	this.mount = (callback) => mounts.push(callback);
 	this.unmount = (callback) => unmounts.push(callback);
 
-	const arrToString = (arr: TemplateArg[]): number | string | Render => arr.reduce((acc: number | string | Render, arg) => `${acc}${argToString(arg)}`, '');
-	const argToString = (arg: TemplateArg): number | string | Render => Array.isArray(arg) ? arrToString(arg) : arg || typeof arg === 'number' ? arg : '';
+	const arrToString = (arr: RenderArg[]): number | string | Render => arr.reduce((acc: number | string | Render, arg) => `${acc}${argToString(arg)}`, '');
+	const argToString = (arg: RenderArg): number | string | Render => Array.isArray(arg) ? arrToString(arg) : arg || typeof arg === 'number' ? arg : '';
 	const html = template.reduce((acc, part, i) => `${acc}${part}${argToString(args[i])}`, '');
 
 	let unrenderedEls: [Element, Render][] = [];
@@ -87,7 +87,7 @@ function Render(this: Render, template: TemplateStringsArray, ...args: TemplateA
  * 	<div>Hello, ${name}!</div>
  * `;
  */
-export const html = (template: TemplateStringsArray, ...args: TemplateArg[]): Render => {
+export const html = (template: TemplateStringsArray, ...args: RenderArg[]): Render => {
 	return new Render(template, ...args);
 };
 
