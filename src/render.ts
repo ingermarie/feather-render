@@ -1,7 +1,11 @@
 import { Feather, isClient } from './bridge';
 
+/**
+ * Supported arguments for {@link html}
+ */
 export type RenderArg = undefined | false | number | string | Render | RenderArg[];
 
+/** @hideconstructor */
 declare class Render {
 	constructor(template: TemplateStringsArray, ...args: RenderArg[])
 	/**
@@ -115,16 +119,12 @@ function Render(this: Render, template: TemplateStringsArray, ...args: RenderArg
 
 /**
  * Create a new instance of `Render`
- * @param template {TemplateStringsArray} - Template string array
- * @param args {TemplateArg[]} - Template arguments
- * @returns {Render}
+ * @param template See tagged template example below
+ * @param args See tagged template example below
  * @example
  * import { html } from 'feather-render';
  *
- * const Component = ({ name }) => html`
- * 	<div>Hello, ${name}!</div>
- * `;
- */
+ * html`<div>${'arg'}</div>`; // Render {refs: {…}, mount: ƒ, unmount: ƒ, …} */
 export const html = (template: TemplateStringsArray, ...args: RenderArg[]): Render => {
 	return new Render(template, ...args);
 };

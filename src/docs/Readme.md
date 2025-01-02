@@ -57,65 +57,7 @@ Examples
 - [CSS in JS](#css-in-js)
 
 ## Usage
-### Basic syntax
-```ts
-import { FR, html } from 'feather-render';
-import { TodoItemProps } from './TodoItem.types';
-
-const TodoItem: FR<TodoItemProps> = ({ todo }) => {
-  return html`
-	<li>${todo.title}</li>
-  `;
-};
-
-const TodoList: FR = () => {
-  return html`
-	<ul>${todos.map(todo => TodoItem({ todo }))}</ul>
-  `;
-};
-
-const Document: FR = () => html`
-  <!DOCTYPE html>
-  <html lang="en">
-	<head>
-	  <meta charset="UTF-8">
-	  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-	  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	  <title>Feather</title>
-	  <script type="module" src="index.mjs"></script>
-	</head>
-	<body>
-	  ${TodoList()}
-	</body>
-  </html>
-`;
-```
-Tip: Plugins for VSCode like lit-html or Inline HTML can be used for syntax highlighting.
-
-### Server-Side Rendering (SSR)
-```ts
-import express from 'express';
-import { Document } from './components/Document';
-
-const server = express();
-
-server.use(express.static('dist'));
-
-server.get('/', (req, res) => {
-  const document = Document({ req });
-  res.send(document.toString());
-});
-
-server.listen(5000);
-```
-
-### Client hydration
-```ts
-import { hydrate } from 'feather-render';
-import { TodoList } from './components/TodoList.js';
-
-hydrate(TodoList(), document.body);
-```
+Done
 
 ## Documentation
 ### `html()`

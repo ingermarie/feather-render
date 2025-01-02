@@ -3,16 +3,15 @@ import { Render } from './render';
 
 /**
  * Hydrate a `Render` element produced by ``` html`` ```
- * @param render {Render} - Instance of `Render`
- * @param {HTMLElement} [target=document.body] - Where to hydrate the render element
- * @returns {void}
+ * @param render - Instance of `Render`
+ * @param target - Where to hydrate `Render` element
  * @example
  * import { html, hydrate } from 'feather-render';
  *
- * const Component = () => html`
+ * const App = () => html`
  * 	<div>Hello, World!</div>
  * `;
- * hydrate(Component(), document.body);
+ * hydrate(App(), document.body);
  */
 export const hydrate = (render: Render, target: Element): void => {
 	if (!isClient) return;
