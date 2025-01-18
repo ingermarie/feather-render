@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.3.1
+- Improve hydration lookup
+- Fix feather templates being included in refs
+
 ## v1.3.0
 - Add `FR` (sync) and `FP` (async) types for components
 - Add docs on async components

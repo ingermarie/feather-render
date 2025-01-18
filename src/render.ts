@@ -13,7 +13,7 @@ declare class Render {
 }
 
 let id = 0;
-let unrendered: Render[] = [];
+let unrendered: Record<string, Render> = {};
 function Render(this: Render, template: TemplateStringsArray, ...args: TemplateArg[]) {
 	let mounts: (() => void)[] = [];
 	let unmounts: (() => void)[] = [];
@@ -28,15 +28,16 @@ function Render(this: Render, template: TemplateStringsArray, ...args: TemplateA
 	const argToString = (arg: TemplateArg): number | string | Render => Array.isArray(arg) ? arrToString(arg) : arg || typeof arg === 'number' ? arg : '';
 	const html = template.reduce((acc, part, i) => `${acc}${part}${argToString(args[i])}`, '');
 
+	let unrenderedEls: [Element, Render][] = [];
 	const mount = () => {
 		window.__featherCurrentRender__ = null;
-		for (let render of unrendered.reverse()) {
-			const domNode = document.querySelector(`#feather-${render.id}`);
-			if (domNode?.parentElement && render.element) {
-				domNode.parentElement.replaceChild(render.element, domNode);
+		for (let [domNode, render] of unrenderedEls.reverse()) {
+			if (render.element) {
+				domNode.parentElement?.replaceChild(render.element, domNode);
 			}
 		};
-		unrendered = [];
+		unrendered = {};
+		unrenderedEls = [];
 		for (let mount of mounts) mount();
 		mounts = [];
 	};
@@ -53,16 +54,20 @@ function Render(this: Render, template: TemplateStringsArray, ...args: TemplateA
 		this.element = templateEl.content;
 
 		for (let el of this.element.querySelectorAll('[id]')) {
-			this.refs[el.id] = el;
+			if (el.id.match(/^feather-/)) {
+				unrenderedEls.push([el, unrendered[el.id]]);
+			} else {
+				this.refs[el.id] = el;
+			}
 		}
 		for (let child of this.element.children) {
-			child.__feather__ = new Feather(mount, child.id.match(/^feather-/) ? () => {} : unmount);
+			child.__feather__ = new Feather(mount, child.id.match(/^feather-/) ? () => { } : unmount);
 		}
 	}
 
 	this.toString = () => {
 		if (isClient) {
-			unrendered.push(this);
+			unrendered[`feather-${this.id}`] = this;
 			return `<template id="feather-${this.id}"></template>`;
 		}
 		return html;
