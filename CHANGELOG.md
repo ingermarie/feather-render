@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.3.2
+- Upgrading dev dependencies
+
 ## v1.3.1
 - Improve hydration lookup
 - Fix feather templates being included in refs
