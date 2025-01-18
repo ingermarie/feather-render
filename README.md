@@ -1,13 +1,12 @@
 # Feather Render
 ![gzip](https://img.shields.io/badge/gzip-707_bytes-green)
 ![license](https://img.shields.io/badge/license-ISC-blue)
-![version](https://img.shields.io/badge/npm-v1.3.2-blue)
+![version](https://img.shields.io/badge/npm-v1.3.3-blue)
 
 ✨ A feather light render framework ✨ 721 bytes minified and gzipped - no dependencies - SSR support
 
-Companion frameworks:
+Companion framework:
 - [feather-state](https://www.npmjs.com/package/feather-state)
-- [feather-state-react](https://www.npmjs.com/package/feather-state-react)
 
 Live examples:
 - [Feather To-Do app](https://codesandbox.io/p/devbox/feather-to-do-app-k5ss8j)
