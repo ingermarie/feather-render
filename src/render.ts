@@ -14,6 +14,7 @@ declare class Render {
 
 let id = 0;
 let unrendered: Record<string, Render> = {};
+let unrenderedEls: Map<Render, HTMLTemplateElement> = new Map();
 function Render(this: Render, template: TemplateStringsArray, ...args: TemplateArg[]) {
 	let mounts: (() => void)[] = [];
 	let unmounts: (() => void)[] = [];
@@ -28,16 +29,11 @@ function Render(this: Render, template: TemplateStringsArray, ...args: TemplateA
 	const argToString = (arg: TemplateArg): number | string | Render => Array.isArray(arg) ? arrToString(arg) : arg || typeof arg === 'number' ? arg : '';
 	const html = template.reduce((acc, part, i) => `${acc}${part}${argToString(args[i])}`, '');
 
-	let unrenderedEls: [Element, Render][] = [];
 	const mount = () => {
 		window.__featherCurrentRender__ = null;
-		for (let [domNode, render] of unrenderedEls.reverse()) {
-			if (render.element) {
-				domNode.parentElement?.replaceChild(render.element, domNode);
-			}
-		};
+		unrenderedEls.forEach((domNode, render) => render.element && domNode.parentElement?.replaceChild(render.element, domNode));
+		unrenderedEls.clear();
 		unrendered = {};
-		unrenderedEls = [];
 		for (let mount of mounts) mount();
 		mounts = [];
 	};
@@ -46,29 +42,33 @@ function Render(this: Render, template: TemplateStringsArray, ...args: TemplateA
 		unmounts = [];
 	};
 
-	if (isClient) {
-		window.__featherCurrentRender__ = this;
-		const templateEl = document.createElement('template');
-		templateEl.innerHTML = html;
+	isClient && Object.defineProperty(this, 'element', {
+		get() {
+			window.__featherCurrentRender__ = this;
 
-		this.element = templateEl.content;
-
-		for (let el of this.element.querySelectorAll('[id]')) {
-			if (el.id.match(/^feather-/)) {
-				unrenderedEls.push([el, unrendered[el.id]]);
-			} else {
-				this.refs[el.id] = el;
+			let templateEl = unrenderedEls.get(this);
+			if (!templateEl) {
+				templateEl = document.createElement('template');
+				templateEl.innerHTML = html;
 			}
-		}
-		for (let child of this.element.children) {
-			child.__feather__ = new Feather(mount, child.id.match(/^feather-/) ? () => { } : unmount);
-		}
-	}
 
+			for (let el of templateEl.content.querySelectorAll('[id]')) {
+				if (el.id.match(/^feather-/) && el instanceof HTMLTemplateElement) {
+					unrenderedEls.set(unrendered[el.id], el);
+				} else {
+					this.refs[el.id] = el;
+				}
+			}
+			for (let child of templateEl.content.children) {
+				child.__feather__ = new Feather(mount, child.id.match(/^feather-/) ? () => { } : unmount);
+			}
+			return templateEl.content;
+		},
+	});
 	this.toString = () => {
 		if (isClient) {
 			unrendered[`feather-${this.id}`] = this;
-			return `<template id="feather-${this.id}"></template>`;
+			return `<template id="feather-${this.id}">${html}</template>`;
 		}
 		return html;
 	};
